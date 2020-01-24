@@ -36,7 +36,10 @@ router.post("/customer/signup", (req, res, next) => {
               .then(result => {
                 console.log(result);
                 res.status(201).json({
-                  message: "account created"
+                  message: "account created",
+                  uid: result._id,
+                  email: result.email,
+                  displayName: result.displayName
                 });
               })
               .catch(err => {
@@ -79,7 +82,10 @@ router.post("/customer/login", (req, res, next) => {
           );
           return res.status(200).json({
             message: "Auth successful",
-            token: token
+            uid: user[0]._id,
+            email: user[0].email,
+            displayName: user[0].displayName,
+            token: token,
           });
         }
         res.status(401).json({
