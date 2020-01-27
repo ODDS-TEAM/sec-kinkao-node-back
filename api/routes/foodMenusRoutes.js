@@ -18,7 +18,6 @@ router.post("/v2", (req, res, next) => {
       else {
         var foodMenu = new foodMenusCollection(_.extend({ _id: new mongoose.Types.ObjectId() }, req.body));
         
-
         foodMenu.save()
           .then(result => {
             console.log(result);
@@ -59,7 +58,7 @@ router.get("/:uid", (req, res, next) => {
       })
     }
     else {
-      res.status(200).send(result)
+      res.status(200).json(result)
     }
   })
 });
