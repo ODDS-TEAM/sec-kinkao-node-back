@@ -45,10 +45,11 @@ router.get("/:uid", (req, res, next) => {
     },
     {
       $project: { 
-        foodMerchantId: "$_id", 
+        foodMenusId: "$_id", 
         imageUrl: 1, 
         foodName: 1,
         price: 1,
+        _id: 0,
       }
     }
   ]).exec((err, result) => {
