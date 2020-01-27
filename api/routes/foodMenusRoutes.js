@@ -45,7 +45,7 @@ router.get("/:uid", (req, res, next) => {
     },
     {
       $project: { 
-        foodMenusId: "$_id", 
+        foodMenuId: "$_id", 
         imageUrl: 1, 
         foodName: 1,
         price: 1,
