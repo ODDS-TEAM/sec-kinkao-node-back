@@ -10,6 +10,7 @@ dotenv.config();
 // define path of each routes
 const authenticationRoutes = require("./api/routes/authenticationRoutes");
 const helloRoutes = require('./api/routes/hellloRoutes');
+const foodMenusRoutes = require('./api/routes/foodMenusRoutes');
 
 mongoose.connect(
   process.env.DB_CONNECT,
@@ -37,8 +38,9 @@ app.use((req, res, next) => {
 });
 
 // Routes which should handle requests
-app.use("/auth", authenticationRoutes);
 app.use("/", helloRoutes);
+app.use("/auth", authenticationRoutes);
+app.use("/merchant/menu", foodMenusRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
