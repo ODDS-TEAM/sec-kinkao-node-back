@@ -2,14 +2,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var choicesSchema = new Schema({
-    title: { type: String },
-    price: { type: Number },
+    titleChoice: { type: String },  //title
+    priceChoice: { type: Number },  //price
 },
     { versionKey: false }
 );
 
 var optionsSchema = new Schema({
-    title: { type: String },
+    titleOption: { type: String },
     singleChoice: { type: Boolean },
     required: { type: Boolean },
     choices: [choicesSchema],
@@ -24,7 +24,7 @@ var foodMenusSchema = new Schema({
     foodName: { type: String },    // old version is name
     price: { type: Number },
     description: { type: String },
-    imgUrl: { type: String },
+    imageUrl: { type: String },
     options: [optionsSchema],
 },
     { versionKey: false }

@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var itemsSchema = new Schema({
+    dayMenuId: { type: String },
     foodName: { type: String },
     numberOfItem: { type: Number },
     price: { type: Number },    // multiplied
@@ -25,7 +26,6 @@ var orderActivitiesSchema = new Schema({
     merchantName: { type: String },
     items: [itemsSchema],
     paymentMethod: { type: String },
-    dayMenuId: { type: String },
 },
     { versionKey: false }
 );
