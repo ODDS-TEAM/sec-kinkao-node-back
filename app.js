@@ -12,6 +12,7 @@ const authenticationRoutes = require("./api/routes/authenticationRoutes");
 const helloRoutes = require('./api/routes/hellloRoutes');
 const foodMenusRoutes = require('./api/routes/foodMenusRoutes');
 const scheduleRoutes = require('./api/routes/scheduleRoutes');
+const foodOrderCustomerRoutes = require('./api/routes/foodOrderCustomerRoutes');
 
 mongoose.connect(
   process.env.DB_CONNECT,
@@ -43,6 +44,7 @@ app.use("/", helloRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/merchant/menu", foodMenusRoutes);
 app.use("/merchant/schedule", scheduleRoutes);
+app.use("/customer/food/order", foodOrderCustomerRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
