@@ -5,7 +5,7 @@ _ = require("underscore")
 
 const orderActivitiesCollection = require("../models/orderActivitiesModel");
 
-// show all order for merchant
+//show all order for merchant
 router.get("/:merchantId", (req, res, next) => {
     orderActivitiesCollection.aggregate([
         {
@@ -13,6 +13,7 @@ router.get("/:merchantId", (req, res, next) => {
         },
         {
             $project: {
+                _id: 0,
                 orderId: "$_id",
                 orderType: 1,
                 dateTime: 1,
@@ -46,5 +47,31 @@ router.get("/:merchantId", (req, res, next) => {
         }
     })
 });
+
+
+//show order detail for merchant
+router.get("/detail/:orderId", (req, res, next) => {
+
+  orderActivitiesCollection.find({ _id: req.params.orderId }).sort({ _id: -1 })
+    .exec()
+    .then(docs => {
+      if (docs != '') {
+        res.status(200).json(docs)
+      }
+      else {
+        res.status(401).json({
+            message: "empty"
+        })
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+          message: err
+      })
+    });
+
+});
+
 
 module.exports = router;
