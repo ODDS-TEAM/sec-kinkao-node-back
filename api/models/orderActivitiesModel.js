@@ -22,6 +22,7 @@ var orderActivitiesSchema = new Schema({
     queue: { type: Number },        // by back-end
     customerId: { type: String },
     customerName: { type: String },
+    customerImageUrl: { type: String },
     merchantId: { type: String },
     merchantName: { type: String },
     items: [itemsSchema],
