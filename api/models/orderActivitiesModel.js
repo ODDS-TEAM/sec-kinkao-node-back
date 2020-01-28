@@ -19,7 +19,7 @@ var orderActivitiesSchema = new Schema({
     orderType: { type: String },    // food or punsuk
     dateTime: { type: Date },       // by back-end
     state: { type: String },        // by back-end      // wc, ck, cd, cc, cp
-    queue: { type: Number },       // by back-end
+    queue: { type: Number },        // by back-end
     customerId: { type: String },
     customerName: { type: String },
     merchantId: { type: String },
@@ -30,7 +30,7 @@ var orderActivitiesSchema = new Schema({
     { versionKey: false }
 );
 
-module.exports = mongoose.model('foodMenus', orderActivitiesSchema);
+module.exports = mongoose.model('orderActivities', orderActivitiesSchema);
 
 // wc : waiting confirm,
 // cc : canceled,
