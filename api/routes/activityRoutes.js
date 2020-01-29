@@ -55,8 +55,7 @@ router.get("/:orderId", (req, res, next) => {
         },
         {
             $project: {
-                _id: 0,
-                orderId: "$_id",
+                _id: 1,
                 orderType: 1,
                 dateTime: 1,
                 state: 1,
