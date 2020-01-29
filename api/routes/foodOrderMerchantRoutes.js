@@ -49,8 +49,6 @@ router.get("/:merchantId", (req, res, next) => {
     })
 });
 
-
-//show order detail for merchant
 router.get("/detail/:orderId", (req, res, next) => {
 
     orderActivitiesCollection.findOne({ _id: req.params.orderId })
@@ -74,8 +72,6 @@ router.get("/detail/:orderId", (req, res, next) => {
 
 });
 
-
-//when merchant want to accept an order
 router.post("/confirm/:orderId", (req, res, next) => {
     var dayMenuIdArray;
     var queueNow;
@@ -121,7 +117,7 @@ router.post("/confirm/:orderId", (req, res, next) => {
                 console.log(docs);
                 if (docs != '') {
                     queueNow = Number(docs.queue);
-                    console.log('queryLastQueue ',queueNow)
+                    console.log('queryLastQueue ', queueNow)
                     updateQueueAndState();
                 }
                 else {
@@ -174,8 +170,6 @@ router.post("/confirm/:orderId", (req, res, next) => {
 
 });
 
-
-//when merchant want to reject an order
 router.post("/cancel/:orderId", (req, res, next) => {
 
     orderActivitiesCollection.updateOne({ _id: req.params.orderId }, {
@@ -195,6 +189,44 @@ router.post("/cancel/:orderId", (req, res, next) => {
         }
     });
 
+});
+
+router.post("/done/:orderId", (req, res, next) => {
+    orderActivitiesCollection.updateOne({ _id: req.params.orderId }, {
+        $set: {
+            state: 'cd'
+        }
+    }, function (err, docs) {
+        if (err) {
+            res.status(401).json({
+                message: err
+            })
+        }
+        else {
+            res.status(200).json({
+                message: "state updated to cooking done (cd)"
+            })
+        }
+    });
+});
+
+router.post("/complete/:orderId", (req, res, next) => {
+    orderActivitiesCollection.updateOne({ _id: req.params.orderId }, {
+        $set: {
+            state: 'cp'
+        }
+    }, function (err, docs) {
+        if (err) {
+            res.status(401).json({
+                message: err
+            })
+        }
+        else {
+            res.status(200).json({
+                message: "state updated to complete (cp)"
+            })
+        }
+    });
 });
 
 module.exports = router;
