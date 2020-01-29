@@ -78,43 +78,33 @@ router.get("/detail/:orderId", (req, res, next) => {
 //when merchant want to accept an order
 router.post("/confirm/:orderId", (req, res, next) => {
     var dayMenuIdArray;
+    var queueNow;
+    var merchantIdResult;
+
     orderActivitiesCollection.aggregate([
         {
-          $match: { _id: req.params.orderId }
+            $match: { _id: req.params.orderId }
         },
         {
-          $project: { 
-            _id: 0,
-            dayMenuId: '$items.dayMenuId'
-          }
+            $project: {
+                _id: 0,
+                dayMenuId: '$items.dayMenuId',
+                merchantId: 1,
+            }
         }
-      ]).exec((err, result) => {
+    ]).exec((err, result) => {
         if (err) {
-            res.status(401).json({
+            res.status(500).json({
                 message: err
             })
         }
         else {
             if (result != '') {
-                // res.status(200).json(result[0].dayMenuId)
-                dayMenuIdArray = result[0].dayMenuId
-                console.log(dayMenuIdArray)
-                dayMenusCollection.update({ _id: { $in: dayMenuIdArray } }, {
-                    $inc: {
-                        foodLeft: -1
-                    }
-                }, function (err, docs) {
-                    if (err) {
-                        res.status(401).json({
-                            message: err
-                        })
-                    }
-                    else {
-                        res.status(200).json({
-                            message: "foodLeft decreased"
-                        })
-                    }
-                });
+                dayMenuIdArray = result[0].dayMenuId;
+                merchantIdResult = result[0].merchantId
+
+                queryLastQueue(merchantIdResult);
+                decreasingFoodLeft(dayMenuIdArray);
             }
             else {
                 res.status(401).json({
@@ -124,20 +114,63 @@ router.post("/confirm/:orderId", (req, res, next) => {
         }
     })
 
-    orderActivitiesCollection.updateOne({ _id: req.params.orderId }, {
-        $set: {
-            state: 'cf'
-        }
-    }, function (err, docs) {
-        if (err) {
-            res.status(401).json({
-                message: err
+    function queryLastQueue(merchantIdResult) {
+        orderActivitiesCollection.findOne({ merchantId: merchantIdResult }).sort({ _id: -1 }).limit(1)
+            .exec()
+            .then(docs => {
+                console.log(docs);
+                if (docs != '') {
+                    queueNow = Number(docs.queue);
+                    console.log('queryLastQueue ',queueNow)
+                    updateQueueAndState();
+                }
+                else {
+                    queueNow = 0;
+                    updateQueueAndState();
+                }
             })
-        }
-        else {
-            console.log('state updated to confirm')
-        }
-    });
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    function updateQueueAndState() {
+        console.log('updateQueueAndState', queueNow)
+        orderActivitiesCollection.updateOne({ _id: req.params.orderId }, {
+            $set: {
+                state: 'cf',
+                queue: queueNow + 1
+            }
+        }, function (err, docs) {
+            if (err) {
+                res.status(500).json({
+                    message: err
+                })
+            }
+            else {
+                res.status(200).json({
+                    message: 'state updated to confirmed and your queue is ' + (queueNow + 1)
+                })
+            }
+        });
+    }
+
+    function decreasingFoodLeft(dayMenuIdArray) {
+        dayMenusCollection.update({ _id: { $in: dayMenuIdArray } }, {
+            $inc: {
+                foodLeft: -1
+            }
+        }, function (err, docs) {
+            if (err) {
+                res.status(401).json({
+                    message: err
+                })
+            }
+            else {
+                console.log('foodLeft decreased');
+            }
+        });
+    }
 
 });
 
