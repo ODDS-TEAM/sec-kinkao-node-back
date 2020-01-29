@@ -67,8 +67,7 @@ router.get("/:orderId", (req, res, next) => {
                 merchantId: 1,
                 merchantName: 1,
                 paymentMethod: 1,
-                'items.foodName': 1,
-                'items.numberOfItem': 1,
+                items: 1
             }
         }
     ]).exec((err, result) => {
