@@ -6,7 +6,7 @@ var itemsSchema = new Schema({
     foodName: { type: String },
     numberOfItem: { type: Number },
     price: { type: Number },    // multiplied
-    pictureUrl: { type: String },
+    imageUrl: { type: String },
     options: [String],
     specialInstruction: { type: String }
 },
