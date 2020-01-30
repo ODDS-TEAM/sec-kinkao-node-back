@@ -50,7 +50,7 @@ app.use("/merchant/schedule", scheduleRoutes);
 app.use("/merchant/activity", activityRoutes);
 app.use("/merchant/food/order", foodOrderMerchantRoutes);
 app.use("/customer/food/order", foodOrderCustomerRoutes);
-app.use("/customer/week", foodThisWeekRoutes)
+app.use("/customer/food/week", foodThisWeekRoutes)
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
