@@ -109,3 +109,4 @@ dist
 #### custom ignore #####
 
 package-lock.json
+.DS_Store
