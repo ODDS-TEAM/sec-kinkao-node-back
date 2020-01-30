@@ -9,19 +9,9 @@ var merchantAccountsSchema = new Schema({
     ownerName: { type: String },
     phoneNumber: { type: String },
     description: { type: String },
-    imgUrl: { type: String },
+    imageUrl: { type: String },
 },
     { versionKey: false }
 );
 
 module.exports = mongoose.model('merchantAccounts', merchantAccountsSchema);
-
-
-//  old version
-// restaurantInfo: {
-//     name: { type: String },
-//     ownerName: { type: String},
-//     phoneNumber: { type: String },
-//     description: { type: String },
-//     imgUrl: { type: String },
-// },
