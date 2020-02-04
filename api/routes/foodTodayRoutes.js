@@ -12,12 +12,13 @@ router.get("/", (req, res, next) => {
     var dd = String(today.getDate());
     var mm = String(today.getMonth() + 1)
     var yyyy = today.getFullYear();
-    today = dd + '/' + mm + '/' + yyyy;
+    todayString = dd + '/' + mm + '/' + yyyy;
+    console.log(todayString)
 
     dayMenusCollection.aggregate([
         {
             $match: {
-                date: '28/1/2020',
+                date: todayString,
             }
         },
         {
