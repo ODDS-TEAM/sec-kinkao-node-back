@@ -18,9 +18,7 @@ router.post("/", (req, res, next) => {
 
   order.save()
     .then(result => {
-      res.status(201).json({
-        message: "order created"
-      });
+      res.status(201).json(result);
     })
     .catch(err => {
       console.log(err);
