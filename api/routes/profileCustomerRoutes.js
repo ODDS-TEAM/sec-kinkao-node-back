@@ -31,4 +31,25 @@ router.get("/:uid", (req, res, next) => {
 
 });
 
+router.post("/edit/:uid", (req, res, next) => {
+    customerAccountsCollection.updateOne({ _id: req.params.uid }, {
+        $set: {
+            email: req.body.email,
+            displayName: req.body.displayName,
+        }
+    }, function (err, docs) {
+        if (err) {
+            res.status(500).json({
+                message: err
+            })
+        }
+        else {
+            res.status(200).json({
+                message: 'profile updated'
+            })
+        }
+    });
+
+});
+
 module.exports = router;
