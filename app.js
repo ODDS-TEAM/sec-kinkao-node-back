@@ -14,7 +14,7 @@ const foodMenusRoutes = require('./api/routes/foodMenusRoutes');
 const scheduleRoutes = require('./api/routes/scheduleRoutes');
 const foodOrderCustomerRoutes = require('./api/routes/foodOrderCustomerRoutes');
 const foodOrderMerchantRoutes = require('./api/routes/foodOrderMerchantRoutes');
-const activityRoutes = require('./api/routes/activityRoutes');
+const activityMerchantRoutes = require('./api/routes/activityMerchantRoutes');
 const foodThisWeekRoutes = require('./api/routes/foodThisWeekRoutes');
 const foodTodayRoutes = require('./api/routes/foodTodayRoutes');
 
@@ -48,7 +48,7 @@ app.use("/", helloRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/merchant/menu", foodMenusRoutes);
 app.use("/merchant/schedule", scheduleRoutes);
-app.use("/merchant/activity", activityRoutes);
+app.use("/merchant/activity", activityMerchantRoutes);
 app.use("/merchant/food/order", foodOrderMerchantRoutes);
 app.use("/customer/food/order", foodOrderCustomerRoutes);
 app.use("/customer/food/week", foodThisWeekRoutes);
