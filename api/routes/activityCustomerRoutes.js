@@ -38,4 +38,28 @@ router.get("/:uid", (req, res, next) => {
     })
 
 });
+
+router.get("/detail/:_id", (req, res, next) => {
+    orderActivitiesCollection.findOne({ _id: req.params._id })
+        .exec()
+        .then(docs => {
+            console.log(docs)
+            if (docs == '' || docs == null) {
+                res.status(401).json({
+                    message: "This activity cannot be found"
+                })
+            }
+            else {
+                res.status(200).json(docs)
+            }
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: err
+            })
+        });
+
+});
+
 module.exports = router;

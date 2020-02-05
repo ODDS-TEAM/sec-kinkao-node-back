@@ -19,6 +19,7 @@ const activityCustomerRoutes = require('./api/routes/activityCustomerRoutes');
 const foodThisWeekRoutes = require('./api/routes/foodThisWeekRoutes');
 const foodTodayRoutes = require('./api/routes/foodTodayRoutes');
 const optionCustomerRoutes = require('./api/routes/optionCustomerRoutes');
+const proflieCustomerRoutes = require('./api/routes/profileCustomerRoutes');
 
 mongoose.connect(
   process.env.DB_CONNECT,
@@ -57,6 +58,7 @@ app.use("/customer/food/week", foodThisWeekRoutes);
 app.use("/customer/food/today", foodTodayRoutes);
 app.use("/customer/activity", activityCustomerRoutes);
 app.use("/customer/food/option", optionCustomerRoutes);
+app.use("/customer/profile", proflieCustomerRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
