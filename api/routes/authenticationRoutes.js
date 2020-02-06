@@ -10,6 +10,7 @@ const merchantCollection = require("../models/merchantAccountsModel");
 // customer
 router.post("/customer/signup", (req, res, next) => {
   console.log(req.body);
+  console.log(req.headers);
   customerCollection.find({ email: req.body.email })
     .exec()
     .then(user => {
