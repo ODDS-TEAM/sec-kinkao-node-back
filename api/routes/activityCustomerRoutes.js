@@ -8,7 +8,7 @@ const orderActivitiesCollection = require("../models/orderActivitiesModel");
 router.get("/:uid", (req, res, next) => {
     orderActivitiesCollection.aggregate([
         {
-            $match: { customerId: req.params.uid, state: {$in: ['wc', 'ck', 'cd', 'sc']} }
+            $match: { customerId: req.params.uid, state: {$in: ['wc', 'cf', 'cd', 'sc']} }
         },
         {
             $project: {

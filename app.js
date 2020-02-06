@@ -54,7 +54,7 @@ app.use("/merchant/menu", foodMenusRoutes);
 app.use("/merchant/schedule", scheduleRoutes);
 app.use("/merchant/activity", activityMerchantRoutes);
 app.use("/merchant/food/order", foodOrderMerchantRoutes);
-app.use("/merchamt/profile", profileMerchantRoutes);
+app.use("/merchant/profile", profileMerchantRoutes);
 app.use("/customer/food/order", foodOrderCustomerRoutes);
 app.use("/customer/food/week", foodThisWeekRoutes);
 app.use("/customer/food/today", foodTodayRoutes);
