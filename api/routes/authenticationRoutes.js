@@ -121,7 +121,7 @@ router.delete("/customer/:userId", (req, res, next) => {
 
 
 // merchant
-router.post("/merchant/signup/v2", (req, res, next) => {
+router.post("/merchant/signup", (req, res, next) => {
   merchantCollection.find({ email: req.body.email })
     .exec()
     .then(user => {
@@ -166,7 +166,7 @@ router.post("/merchant/signup/v2", (req, res, next) => {
     });
 });
 
-router.post("/merchant/login/v2", (req, res, next) => {
+router.post("/merchant/login", (req, res, next) => {
   merchantCollection.find({ email: req.body.email })
     .exec()
     .then(user => {
