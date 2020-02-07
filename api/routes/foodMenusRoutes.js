@@ -5,7 +5,7 @@ _ = require("underscore")
 
 const foodMenusCollection = require("../models/foodMenusModel");
 
-router.post("/v2", (req, res, next) => {
+router.post("/", (req, res, next) => {
   console.log(req.body);
   foodMenusCollection.find({ foodName: req.body.foodName })
     .exec()
@@ -35,7 +35,6 @@ router.post("/v2", (req, res, next) => {
     });
 });
 
-
 router.get("/:uid", (req, res, next) => {
 
   foodMenusCollection.aggregate([
@@ -61,6 +60,22 @@ router.get("/:uid", (req, res, next) => {
       res.status(200).json(result)
     }
   })
+});
+
+router.delete("/:foodMenuId", (req, res, next) => {
+  foodMenusCollection.remove({ _id: req.params.foodMenuId })
+    .exec()
+    .then(result => {
+      res.status(200).json({
+        message: "menu deleted"
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({
+        error: err
+      });
+    });
 });
 
 

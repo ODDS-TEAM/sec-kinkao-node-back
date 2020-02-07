@@ -7,6 +7,8 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+app.use(express.static('uploads'));
+
 // define path of each routes
 const authenticationRoutes = require("./api/routes/authenticationRoutes");
 const helloRoutes = require('./api/routes/hellloRoutes');
@@ -21,6 +23,7 @@ const foodTodayRoutes = require('./api/routes/foodTodayRoutes');
 const optionCustomerRoutes = require('./api/routes/optionCustomerRoutes');
 const profileCustomerRoutes = require('./api/routes/profileCustomerRoutes');
 const profileMerchantRoutes = require('./api/routes/profileMerchantRoutes');
+const uploadImageRoutes = require('./api/routes/uploadImageRoutes');
 
 mongoose.connect(
   process.env.DB_CONNECT,
@@ -47,9 +50,12 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.static(__dirname + '/public'));
+
 // Routes which should handle requests
 app.use("/", helloRoutes);
 app.use("/auth", authenticationRoutes);
+app.use("/upload/img", uploadImageRoutes);
 app.use("/merchant/menu", foodMenusRoutes);
 app.use("/merchant/schedule", scheduleRoutes);
 app.use("/merchant/activity", activityMerchantRoutes);

@@ -118,52 +118,57 @@ router.delete("/customer/:userId", (req, res, next) => {
     });
 });
 
-
-
 // merchant
-router.post("/merchant/signup", (req, res, next) => {
-  merchantCollection.find({ email: req.body.email })
+router.get("/merchant/signup/:email", (req, res, next) => {
+  merchantCollection.find({ email: req.params.email })
     .exec()
     .then(user => {
       if (user.length >= 1) {
         return res.status(401).json({
           message: "Mail exists"
         });
-      } else {
-        bcrypt.hash(req.body.password, 10, (err, hash) => {
-          if (err) {
-            return res.status(500).json({
-              error: err
-            });
-          } else {
-            const user = new merchantCollection({
-              _id: new mongoose.Types.ObjectId(),
-              email: req.body.email,
-              password: hash,
-              restaurantName: req.body.restaurantName,
-              ownerName: req.body.ownerName,
-              phoneNumber: req.body.phoneNumber,
-              description: req.body.description,
-              imageUrl: 'url'
-            });
-            user
-              .save()
-              .then(result => {
-                console.log(result);
-                res.status(201).json({
-                  message: "account created"
-                });
-              })
-              .catch(err => {
-                console.log(err);
-                res.status(500).json({
-                  error: err
-                });
-              });
-          }
+      }
+      else {
+        return res.status(200).json({
+          message: "success"
         });
       }
     });
+});
+
+router.post("/merchant/signup", (req, res, next) => {
+  bcrypt.hash(req.body.password, 10, (err, hash) => {
+    if (err) {
+      return res.status(500).json({
+        error: err
+      });
+    } else {
+      const user = new merchantCollection({
+        _id: new mongoose.Types.ObjectId(),
+        email: req.body.email,
+        password: hash,
+        restaurantName: req.body.restaurantName,
+        ownerName: req.body.ownerName,
+        phoneNumber: req.body.phoneNumber,
+        description: req.body.description,
+        imageUrl:'merchantUrl'
+      });
+      user
+        .save()
+        .then(result => {
+          console.log(result);
+          res.status(201).json({
+            message: "account created"
+          });
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(500).json({
+            error: err
+          });
+        });
+    }
+  });
 });
 
 router.post("/merchant/login", (req, res, next) => {
@@ -194,7 +199,14 @@ router.post("/merchant/login", (req, res, next) => {
           );
           return res.status(200).json({
             message: "Auth successful",
-            token: token
+            uid: user[0]._id,
+            email: user[0].email,
+            restaurantName: user[0].restaurantName,
+            phoneNumber: user[0].phoneNumber,
+            ownerName: user[0].ownerName,
+            description: user[0].description,
+            imageUrl: user[0].imageUrl,
+            token: token,
           });
         }
         res.status(401).json({
