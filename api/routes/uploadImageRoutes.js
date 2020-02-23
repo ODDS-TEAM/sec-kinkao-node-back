@@ -144,7 +144,7 @@ router.post("/food/:foodMenuId", (req, res, next) => {
         }
         imagePath = `${process.env.SERVER_URL}${req.file.filename}`
 
-        foodMenusCollection.updateOne({ _id: req.params._id }, {
+        foodMenusCollection.updateOne({ _id: req.params.foodMenuId }, {
             $set: {
                 imageUrl: imagePath,
             }
