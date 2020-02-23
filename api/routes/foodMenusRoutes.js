@@ -20,10 +20,7 @@ router.post("/", (req, res, next) => {
         
         foodMenu.save()
           .then(result => {
-            console.log(result);
-            res.status(201).json({
-              message: "food menu created",
-            });
+            res.status(201).json(result);
           })
           .catch(err => {
             console.log(err);
