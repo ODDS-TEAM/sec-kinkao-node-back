@@ -72,7 +72,7 @@ router.post("/customer/:_id", (req, res, next) => {
             cb(null,'uploads/');
         },
         filename: function (req, file, cb) {
-            cb(null, process.env.SERVER_URL + req.params._id);
+            cb(null, req.params._id);
         }
     });
 
@@ -91,7 +91,7 @@ router.post("/customer/:_id", (req, res, next) => {
         else if (err) {
             return res.send(err);
         }
-        imagePath = req.file.path
+        imagePath = `${process.env.SERVER_URL}${req.file.filename}`
 
         customerCollection.updateOne({ _id: req.params._id }, {
             $set: {
@@ -123,7 +123,7 @@ router.post("/food/:foodMenuId", (req, res, next) => {
             cb(null,'uploads/');
         },
         filename: function (req, file, cb) {
-            cb(null, process.env.SERVER_URL + req.params._id);
+            cb(null, req.params.foodMenuId);
         }
     });
 
@@ -142,7 +142,7 @@ router.post("/food/:foodMenuId", (req, res, next) => {
         else if (err) {
             return res.send(err);
         }
-        imagePath = req.file.path
+        imagePath = `${process.env.SERVER_URL}${req.file.filename}`
 
         foodMenusCollection.updateOne({ _id: req.params._id }, {
             $set: {
