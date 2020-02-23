@@ -108,5 +108,21 @@ router.put("/edit/:_id", (req, res, next) => {
     });
 });
 
+router.delete("/:dayMenuId", (req, res, next) => {
+    dayMenusCollection.remove({ _id: req.params.dayMenuId })
+      .exec()
+      .then(result => {
+        res.status(200).json({
+          message: "day menu deleted"
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).json({
+          error: err
+        });
+      });
+  });
+
 
 module.exports = router;
