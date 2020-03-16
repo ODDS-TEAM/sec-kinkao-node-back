@@ -16,6 +16,7 @@ router.get("/:uid", (req, res, next) => {
             }
             else {
                 res.status(200).json({
+                    uid: docs._id,
                     email: docs.email,
                     displayName: docs.displayName,
                     imageUrl: docs.imageUrl
