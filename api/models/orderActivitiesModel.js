@@ -37,4 +37,4 @@ module.exports = mongoose.model('orderActivities', orderActivitiesSchema);
 // cc : canceled,
 // cf : confirmed,
 // cd : cooking done, ready to deliver
-// cp : complete,
+// cp : complete, >>> sc

@@ -9,7 +9,6 @@ dotenv.config();
 
 app.use(express.static('uploads'));
 
-// define path of each routes
 const authenticationRoutes = require("./api/routes/authenticationRoutes");
 const helloRoutes = require('./api/routes/hellloRoutes');
 const foodMenusRoutes = require('./api/routes/foodMenusRoutes');
@@ -24,6 +23,8 @@ const optionCustomerRoutes = require('./api/routes/optionCustomerRoutes');
 const profileCustomerRoutes = require('./api/routes/profileCustomerRoutes');
 const profileMerchantRoutes = require('./api/routes/profileMerchantRoutes');
 const uploadImageRoutes = require('./api/routes/uploadImageRoutes');
+const historyCustomerRoutes = require('./api/routes/historyCustomerRoutes');
+const historyMerchantRoutes = require('./api/routes/historyMerchantRoutes');
 
 mongoose.connect(
   process.env.DB_CONNECT,
@@ -67,6 +68,8 @@ app.use("/customer/food/today", foodTodayRoutes);
 app.use("/customer/activity", activityCustomerRoutes);
 app.use("/customer/food/option", optionCustomerRoutes);
 app.use("/customer/profile", profileCustomerRoutes);
+app.use("customer/history", historyCustomerRoutes);
+app.use("merchant/history", historyMerchantRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
