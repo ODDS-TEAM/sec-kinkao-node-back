@@ -76,6 +76,7 @@ router.post("/confirm/:orderId", (req, res, next) => {
     var dayMenuIdArray;
     var queueNow;
     var merchantIdResult;
+    var numberOfItemResult;
 
     orderActivitiesCollection.aggregate([
         {
@@ -86,6 +87,7 @@ router.post("/confirm/:orderId", (req, res, next) => {
                 _id: 0,
                 dayMenuId: '$items.dayMenuId',
                 merchantId: 1,
+                numberOfItem: '$items.numberOfItem',
             }
         }
     ]).exec((err, result) => {
@@ -98,9 +100,10 @@ router.post("/confirm/:orderId", (req, res, next) => {
             if (result != '') {
                 dayMenuIdArray = result[0].dayMenuId;
                 merchantIdResult = result[0].merchantId
-
+                numberOfItemResult = result[0].numberOfItem
+                
                 queryLastQueue(merchantIdResult);
-                decreasingFoodLeft(dayMenuIdArray);
+                decreasingFoodLeft(dayMenuIdArray, numberOfItemResult);
             }
             else {
                 res.status(401).json({
@@ -111,13 +114,11 @@ router.post("/confirm/:orderId", (req, res, next) => {
     })
 
     function queryLastQueue(merchantIdResult) {
-        orderActivitiesCollection.findOne({ merchantId: merchantIdResult }).sort({ _id: -1 }).limit(1)
+        orderActivitiesCollection.find({ merchantId: merchantIdResult, state: {$in: ['cf', 'cp', 'cc']} }).sort({ _id: -1 }).limit(1)
             .exec()
             .then(docs => {
-                console.log(docs);
-                if (docs != '') {
-                    queueNow = Number(docs.queue);
-                    console.log('queryLastQueue ', queueNow)
+                if (docs.length >= 1) {
+                    queueNow = Number(docs[0].queue);
                     updateQueueAndState();
                 }
                 else {
@@ -131,7 +132,6 @@ router.post("/confirm/:orderId", (req, res, next) => {
     }
 
     function updateQueueAndState() {
-        console.log('updateQueueAndState', queueNow)
         orderActivitiesCollection.updateOne({ _id: req.params.orderId }, {
             $set: {
                 state: 'cf',
@@ -151,21 +151,23 @@ router.post("/confirm/:orderId", (req, res, next) => {
         });
     }
 
-    function decreasingFoodLeft(dayMenuIdArray) {
-        dayMenusCollection.update({ _id: { $in: dayMenuIdArray } }, {
-            $inc: {
-                foodLeft: -1
-            }
-        }, function (err, docs) {
-            if (err) {
-                res.status(401).json({
-                    message: err
-                })
-            }
-            else {
-                console.log('foodLeft decreased');
-            }
-        });
+    function decreasingFoodLeft(dayMenuIdArray, numberOfItemResult) {
+        for(var i=0 ; i < dayMenuIdArray.length; i++ ) {
+            dayMenusCollection.update({ _id: dayMenuIdArray[i] }, {
+                $inc: {
+                    foodLeft: -(numberOfItemResult[i])
+                }
+            }, function (err, docs) {
+                if (err) {
+                    res.status(401).json({
+                        message: err
+                    })
+                }
+                else {
+                    console.log('foodLeft decreased');
+                }
+            });
+        }
     }
 
 });
