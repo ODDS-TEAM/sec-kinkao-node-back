@@ -53,7 +53,6 @@ app.use((req, res, next) => {
 
 app.use(express.static(__dirname + '/public'));
 
-// Routes which should handle requests
 app.use("/", helloRoutes);
 app.use("/auth", authenticationRoutes);
 app.use("/upload/img", uploadImageRoutes);
