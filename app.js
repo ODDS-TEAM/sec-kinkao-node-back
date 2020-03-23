@@ -67,8 +67,8 @@ app.use("/customer/food/today", foodTodayRoutes);
 app.use("/customer/activity", activityCustomerRoutes);
 app.use("/customer/food/option", optionCustomerRoutes);
 app.use("/customer/profile", profileCustomerRoutes);
-app.use("customer/history", historyCustomerRoutes);
-app.use("merchant/history", historyMerchantRoutes);
+app.use("/customer/history", historyCustomerRoutes);
+app.use("/merchant/history", historyMerchantRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
