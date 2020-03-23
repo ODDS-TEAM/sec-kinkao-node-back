@@ -26,7 +26,8 @@ var coEatingTableSchema = new Schema({
     restaurantName: { type: String },
     merchantId: { type: String },
     inviteCode: { type: String },
-    ordered: { type: Boolean },
+    // ordered: { type: Boolean },
+    state: { type: String },   // ordering, ordered, complete
     baskets: [basketSchema],
 },
     { versionKey: false }

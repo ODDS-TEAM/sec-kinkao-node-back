@@ -25,6 +25,7 @@ const profileMerchantRoutes = require('./api/routes/profileMerchantRoutes');
 const uploadImageRoutes = require('./api/routes/uploadImageRoutes');
 const historyCustomerRoutes = require('./api/routes/historyCustomerRoutes');
 const historyMerchantRoutes = require('./api/routes/historyMerchantRoutes');
+const tableCustomerRoutes = require('./api/routes/tableCustomerRoutes');
 
 mongoose.connect(
   process.env.DB_CONNECT,
@@ -67,8 +68,9 @@ app.use("/customer/food/today", foodTodayRoutes);
 app.use("/customer/activity", activityCustomerRoutes);
 app.use("/customer/food/option", optionCustomerRoutes);
 app.use("/customer/profile", profileCustomerRoutes);
-app.use("customer/history", historyCustomerRoutes);
-app.use("merchant/history", historyMerchantRoutes);
+app.use("/customer/history", historyCustomerRoutes);
+app.use("/merchant/history", historyMerchantRoutes);
+app.use("/customer/table", tableCustomerRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");
