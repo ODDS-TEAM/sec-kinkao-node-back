@@ -9,10 +9,11 @@ const merchantAccountCollection = require("../models/merchantAccountsModel");
 const coEatingTableCollection = require("../models/coEatingTableModel");
 
 router.post("/create", (req, res, next) => {
+    let randomInviteCode = Math.random().toString(36).substring(7);
     coEatingTableCollection.find({ tableName: req.body.tableName, state: { $in: ['ordering', 'ordered'] } })
         .exec()
-        .then(user => {
-            if (user.length >= 1) {
+        .then(doc => {
+            if (doc.length >= 1) {
                 res.status(401).json({
                     message: "Table name exists"
                 });
@@ -24,6 +25,7 @@ router.post("/create", (req, res, next) => {
                     tableName: req.body.tableName,
                     restaurantName: req.body.restaurantName,
                     merchantId: req.body.merchantId,
+                    inviteCode: randomInviteCode,
                     state: 'ordering'
                 });
                 table
@@ -66,7 +68,7 @@ router.get("/restaurant", (req, res, next) => {
             if (result != '') {
                 merchantAccountCollection.aggregate([
                     {
-                        $match: {$or: result}
+                        $match: { $or: result }
                     },
                     {
                         $project: {
@@ -126,6 +128,38 @@ router.get("/menu/:merchantId", (req, res, next) => {
             res.status(200).json(result)
         }
     })
+});
+
+router.post("/join", (req, res, next) => {
+    coEatingTableCollection.find({ inviteCode: req.body.inviteCode, state: 'ordering' })
+        .exec()
+        .then(result => {
+            if (result.length >= 1) {
+                coEatingTableCollection.updateOne({ inviteCode: req.body.inviteCode }, {
+                    $push: {
+                        baskets: {
+                            $each: [{ customerId: req.body.userId}],
+                        }
+                    }
+                }, function (err, docs) {
+                    if (err) {
+                        res.status(500).json({
+                            message: err
+                        });
+                    }
+                    else {
+                        res.status(200).json({
+                            message: 'user added'
+                        });
+                    }
+                });
+            }
+            else {
+                res.status(401).json({
+                    message: "inviteCode is not match or this table was ordered"
+                })
+            }
+        });
 });
 
 module.exports = router;
