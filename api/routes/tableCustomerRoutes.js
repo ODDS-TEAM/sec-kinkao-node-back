@@ -135,24 +135,7 @@ router.post("/join", (req, res, next) => {
         .exec()
         .then(result => {
             if (result.length >= 1) {
-                coEatingTableCollection.updateOne({ inviteCode: req.body.inviteCode }, {
-                    $push: {
-                        baskets: {
-                            $each: [{ customerId: req.body.userId}],
-                        }
-                    }
-                }, function (err, docs) {
-                    if (err) {
-                        res.status(500).json({
-                            message: err
-                        });
-                    }
-                    else {
-                        res.status(200).json({
-                            message: 'user added'
-                        });
-                    }
-                });
+                checkExistMember();
             }
             else {
                 res.status(401).json({
@@ -160,6 +143,48 @@ router.post("/join", (req, res, next) => {
                 })
             }
         });
+
+    function checkExistMember() {
+        coEatingTableCollection.find({
+            baskets: { 
+                $elemMatch: { customerId: req.body.userId }
+            }
+        })
+            .exec()
+            .then(doc => {
+                if (doc.length >= 1) {
+                    res.status(401).json({
+                        message: "you have already joined"
+                    });
+                }
+                else {
+                    addMember();
+                }
+            });
+    }
+
+    function addMember() {
+        coEatingTableCollection.updateOne({ inviteCode: req.body.inviteCode }, {
+            $push: {
+                baskets: {
+                    $each: [{ customerId: req.body.userId }],
+                }
+            }
+        }, function (err, docs) {
+            if (err) {
+                res.status(500).json({
+                    message: err
+                });
+            }
+            else {
+                res.status(200).json({
+                    message: 'user added',
+                    inviteCode: req.body.inviteCode,
+                    userId: req.body.userId
+                });
+            }
+        });
+    }
 });
 
 module.exports = router;
