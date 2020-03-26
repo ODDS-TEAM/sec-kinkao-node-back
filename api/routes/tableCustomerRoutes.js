@@ -19,27 +19,35 @@ router.post("/create", (req, res, next) => {
                 });
             }
             else {
-                const table = new coEatingTableCollection({
-                    _id: new mongoose.Types.ObjectId(),
-                    leaderId: req.body.leaderId,
-                    tableName: req.body.tableName,
-                    restaurantName: req.body.restaurantName,
-                    merchantId: req.body.merchantId,
-                    inviteCode: randomInviteCode,
-                    state: 'ordering'
-                });
-                table
-                    .save()
-                    .then(result => {
-                        res.status(201).json(result);
-                    })
-                    .catch(err => {
-                        res.status(500).json({
-                            error: err
-                        });
-                    });
+                createTable();
             }
         });
+
+        function createTable() {
+            const table = new coEatingTableCollection({
+                _id: new mongoose.Types.ObjectId(),
+                leaderId: req.body.leaderId,
+                tableName: req.body.tableName,
+                restaurantName: req.body.restaurantName,
+                merchantId: req.body.merchantId,
+                inviteCode: randomInviteCode,
+                state: 'ordering',
+                baskets: {
+                    customerId: req.body.leaderId,
+                }
+            });
+            table
+                .save()
+                .then(result => {
+                    res.status(201).json(result);
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        error: err
+                    });
+                });
+        }
+        
 });
 
 router.get("/restaurant", (req, res, next) => {
