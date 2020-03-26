@@ -21,7 +21,7 @@ router.post("/create", (req, res, next) => {
             else {
                 const table = new coEatingTableCollection({
                     _id: new mongoose.Types.ObjectId(),
-                    userId: req.body.userId,
+                    leaderId: req.body.leaderId,
                     tableName: req.body.tableName,
                     restaurantName: req.body.restaurantName,
                     merchantId: req.body.merchantId,
@@ -146,7 +146,7 @@ router.post("/join", (req, res, next) => {
 
     function checkExistMember() {
         coEatingTableCollection.find({
-            baskets: { 
+            baskets: {
                 $elemMatch: { customerId: req.body.userId }
             }
         })
@@ -185,6 +185,21 @@ router.post("/join", (req, res, next) => {
             }
         });
     }
+});
+
+router.get("/view/:tableId", (req, res, next) => {
+    coEatingTableCollection.find({ _id: req.params.tableId })
+        .exec()
+        .then(doc => {
+            if (doc.length >= 1) {
+                res.status(200).json(doc[0])
+            }
+            else {
+                res.status(401).json({
+                    message: "empty"
+                });
+            }
+        });
 });
 
 module.exports = router;

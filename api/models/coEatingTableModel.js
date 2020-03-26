@@ -22,11 +22,11 @@ var basketSchema = new Schema({
 
 var coEatingTableSchema = new Schema({
     _id: { type: String },
+    leaderId: { type: String },
     tableName: { type: String },
     restaurantName: { type: String },
     merchantId: { type: String },
     inviteCode: { type: String },
-    // ordered: { type: Boolean },
     state: { type: String },   // ordering, ordered, complete
     baskets: [basketSchema],
 },
