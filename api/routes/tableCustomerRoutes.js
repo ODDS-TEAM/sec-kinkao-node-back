@@ -23,31 +23,31 @@ router.post("/create", (req, res, next) => {
             }
         });
 
-        function createTable() {
-            const table = new coEatingTableCollection({
-                _id: new mongoose.Types.ObjectId(),
-                leaderId: req.body.leaderId,
-                tableName: req.body.tableName,
-                restaurantName: req.body.restaurantName,
-                merchantId: req.body.merchantId,
-                inviteCode: randomInviteCode,
-                state: 'ordering',
-                baskets: {
-                    customerId: req.body.leaderId,
-                }
-            });
-            table
-                .save()
-                .then(result => {
-                    res.status(201).json(result);
-                })
-                .catch(err => {
-                    res.status(500).json({
-                        error: err
-                    });
+    function createTable() {
+        const table = new coEatingTableCollection({
+            _id: new mongoose.Types.ObjectId(),
+            leaderId: req.body.leaderId,
+            tableName: req.body.tableName,
+            restaurantName: req.body.restaurantName,
+            merchantId: req.body.merchantId,
+            inviteCode: randomInviteCode,
+            state: 'ordering',
+            baskets: {
+                customerId: req.body.leaderId,
+            }
+        });
+        table
+            .save()
+            .then(result => {
+                res.status(201).json(result);
+            })
+            .catch(err => {
+                res.status(500).json({
+                    error: err
                 });
-        }
-        
+            });
+    }
+
 });
 
 router.get("/restaurant", (req, res, next) => {
@@ -193,6 +193,31 @@ router.post("/join", (req, res, next) => {
             }
         });
     }
+});
+
+router.get("/list/:userId", (req, res, next) => {
+    coEatingTableCollection.aggregate([
+        {
+            $match: { 'baskets.customerId': req.params.userId }
+        },
+        {
+            $project: {
+                _id: 0,
+                tableId: '$_id',
+                tableName: 1,
+                restaurantName: 1,
+            }
+        },
+    ]).exec((err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: err
+            })
+        }
+        else {
+            res.status(200).json(result)
+        }
+    })
 });
 
 router.get("/view/:tableId", (req, res, next) => {
