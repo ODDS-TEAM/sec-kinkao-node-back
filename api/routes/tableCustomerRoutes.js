@@ -3,10 +3,10 @@ const router = express.Router();
 const mongoose = require("mongoose");
 _ = require("underscore")
 
-const foodMenuCollection = require("../models/foodMenusModel");
 const dayMenuCollection = require("../models/dayMenusModel");
 const merchantAccountCollection = require("../models/merchantAccountsModel");
 const coEatingTableCollection = require("../models/coEatingTableModel");
+const orderActivitiesCollection = require("../models/orderActivitiesModel");
 
 router.post("/create", (req, res, next) => {
     let randomInviteCode = Math.random().toString(36).substring(7);
@@ -318,6 +318,94 @@ router.post("/view/add_order", (req, res, next) => {
             });
     }
 
+});
+
+router.post("/view/order/:tableId", (req, res, next) => {
+    let orderData;
+    dataFrom();
+
+    function dataFrom() {
+        coEatingTableCollection.aggregate([
+            {
+                $match: { _id: req.params.tableId }
+            },
+            {
+                $lookup: {
+                    from: "merchantaccounts",
+                    localField: "merchantId",
+                    foreignField: "_id",
+                    as: "fromMerchantItems"
+                },
+            },
+            {
+                $unwind: "$fromMerchantItems"
+            },
+            {
+                $lookup: {
+                    from: "customeraccounts",
+                    localField: "leaderId",
+                    foreignField: "_id",
+                    as: "fromCustomerItems"
+                },
+            },
+            {
+                $unwind: "$fromCustomerItems"
+            },
+            {
+                $project: {
+                    _id: 0,
+                    customerId: '$leaderId',
+                    customerName: '$fromCustomerItems.displayName',
+                    customerImageUrl: '$fromCustomerItems.imageUrl',
+                    merchantId: 1,
+                    merchantName: '$fromMerchantItems.restaurantName',
+                    paymentMethod: 'cash',
+                    items: {
+                        $reduce: {
+                            input: '$baskets.items',
+                            initialValue: [],
+                            in: { $concatArrays: ["$$value", "$$this"] }
+                        },
+                    },
+                }
+            },
+        ]).exec((err, result) => {
+            if (err) {
+                res.status(401).json({
+                    message: err
+                })
+            }
+            else {
+                res.json(result[0])
+                orderData = result[0]
+                sendOrder(orderData);
+            }
+        });
+    }
+
+    function sendOrder(orderData) {
+        var order = new orderActivitiesCollection(_.extend(
+            {
+                _id: new mongoose.Types.ObjectId(),
+                orderType: "food",
+                dateTime: new Date(),
+                state: "wc",
+                queue: -1
+            },
+            orderData
+        ));
+
+        order.save()
+            .then(result => {
+                res.status(201).json(result);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({
+                    error: err
+                });
+            });
+    }
 });
 
 module.exports = router;
