@@ -235,4 +235,56 @@ router.get("/view/:tableId", (req, res, next) => {
         });
 });
 
+router.post("/view/add_menu", (req, res, next) => {
+    coEatingTableCollection.find({ 'baskets.customerId': req.body.userId, _id: req.body.tableId })
+        .exec()
+        .then(doc => {
+            if (doc.length >= 1) {
+                addMenu();
+            }
+            else {
+                res.status(401).json({
+                    message: "you are not member"
+                });
+            }
+        });
+
+    function addMenu() {
+        const menuData = {
+            _id: new mongoose.Types.ObjectId(),
+            dayMenuId: req.body.dayMenuId,
+            foodName: req.body.foodName,
+            numberOfItem: req.body.numberOfItem,
+            price: req.body.price,
+            imageUrl: req.body.imageUrl,
+            options: req.body.options,
+            specialInstruction: req.body.specialInstruction,
+        };
+        coEatingTableCollection.updateOne(
+            {
+                "_id": req.body.tableId,
+                "baskets.customerId": req.body.userId
+            },
+            {
+                $push: {
+                    "baskets.$.items": menuData
+                }
+            })
+            .exec()
+            .then(result => {
+                res.status(200).json({
+                    tableId: req.body.tableId,
+                    dayMenuId: req.body.dayMenuId,
+                    foodName: req.body.foodName,
+                    numberOfItem: req.body.numberOfItem,
+                    price: req.body.price,
+                    imageUrl: req.body.imageUrl,
+                    options: req.body.options,
+                    specialInstruction: req.body.specialInstruction,
+                })
+            });
+    }
+
+});
+
 module.exports = router;
