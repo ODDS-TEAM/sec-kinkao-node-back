@@ -235,7 +235,7 @@ router.get("/view/:tableId", (req, res, next) => {
         });
 });
 
-router.post("/view/add_menu", (req, res, next) => {
+router.post("/view/add_order", (req, res, next) => {
     coEatingTableCollection.find({ 'baskets.customerId': req.body.userId, _id: req.body.tableId })
         .exec()
         .then(doc => {
