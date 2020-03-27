@@ -121,7 +121,7 @@ router.get("/menu/:merchantId", (req, res, next) => {
         {
             $project: {
                 _id: 0,
-                menuName: 1,
+                foodName: '$menuName',
                 price: 1,
                 imageUrl: 1,
             }
@@ -233,6 +233,39 @@ router.get("/view/:tableId", (req, res, next) => {
                 });
             }
         });
+});
+
+router.get("/view/menu/:merchantId", (req, res, next) => {
+
+    var today = new Date();
+    var dd = String(today.getDate());
+    var mm = String(today.getMonth() + 1)
+    var yyyy = today.getFullYear();
+    todayString = dd + '/' + mm + '/' + yyyy;
+
+    dayMenuCollection.aggregate([
+        {
+            $match: { "date": todayString, merchantId: req.params.merchantId }
+        },
+        {
+            $project: {
+                _id: 0,
+                foodMenuId: 1,
+                foodName: '$menuName',
+                price: 1,
+                imageUrl: 1,
+            }
+        },
+    ]).exec((err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: err
+            })
+        }
+        else {
+            res.status(200).json(result)
+        }
+    })
 });
 
 router.post("/view/add_order", (req, res, next) => {
