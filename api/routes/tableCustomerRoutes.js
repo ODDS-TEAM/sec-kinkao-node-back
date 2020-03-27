@@ -5,11 +5,14 @@ _ = require("underscore")
 
 const dayMenuCollection = require("../models/dayMenusModel");
 const merchantAccountCollection = require("../models/merchantAccountsModel");
+const customerAccountCollection = require("../models/customerAccountsModel");
 const coEatingTableCollection = require("../models/coEatingTableModel");
 const orderActivitiesCollection = require("../models/orderActivitiesModel");
 
 router.post("/create", (req, res, next) => {
     let randomInviteCode = Math.random().toString(36).substring(7);
+    let cusImageUrl;
+    let cusName;
     coEatingTableCollection.find({ tableName: req.body.tableName, state: { $in: ['ordering', 'ordered'] } })
         .exec()
         .then(doc => {
@@ -19,9 +22,35 @@ router.post("/create", (req, res, next) => {
                 });
             }
             else {
-                createTable();
+                getCustomerDetail()
             }
         });
+
+    function getCustomerDetail() {
+        customerAccountCollection.aggregate([
+            {
+                $match: { _id: req.body.leaderId }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    customerName: '$displayName',
+                    customerImageUrl: '$imageUrl',
+                }
+            },
+        ]).exec((err, result) => {
+            if (err) {
+                res.status(401).json({
+                    message: err
+                })
+            }
+            else {
+                cusName = result[0].customerName;
+                cusImageUrl = result[0].customerImageUrl;
+                createTable(cusName, cusImageUrl);
+            }
+        });
+    }
 
     function createTable() {
         const table = new coEatingTableCollection({
@@ -39,7 +68,20 @@ router.post("/create", (req, res, next) => {
         table
             .save()
             .then(result => {
-                res.status(201).json(result);
+                res.status(201).json({
+                    _id: result._id,
+                    leaderId: result.leaderId,
+                    tableName: result.tableName,
+                    restaurantName: result.restaurantName,
+                    merchantId: result.merchantId,
+                    inviteCode: result.inviteCode,
+                    state: result.state,
+                    baskets: {
+                        customerId: req.body.leaderId,
+                        customerName: cusName,
+                        customerImageUrl: cusImageUrl,
+                    }
+                });
             })
             .catch(err => {
                 res.status(500).json({
@@ -139,11 +181,13 @@ router.get("/menu/:merchantId", (req, res, next) => {
 });
 
 router.post("/join", (req, res, next) => {
+    let cusName;
+    let cusImageUrl;
     coEatingTableCollection.find({ inviteCode: req.body.inviteCode, state: 'ordering' })
         .exec()
         .then(result => {
             if (result.length >= 1) {
-                checkExistMember();
+                checkExistMember(result[0]._id);
             }
             else {
                 res.status(401).json({
@@ -152,11 +196,12 @@ router.post("/join", (req, res, next) => {
             }
         });
 
-    function checkExistMember() {
+    function checkExistMember(tableId) {
         coEatingTableCollection.find({
+            _id : tableId,
             baskets: {
                 $elemMatch: { customerId: req.body.userId }
-            }
+            },
         })
             .exec()
             .then(doc => {
@@ -166,12 +211,38 @@ router.post("/join", (req, res, next) => {
                     });
                 }
                 else {
-                    addMember();
+                    getCustomerDetail();
                 }
             });
     }
 
-    function addMember() {
+    function getCustomerDetail() {
+        customerAccountCollection.aggregate([
+            {
+                $match: { _id: req.body.userId }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    customerName: '$displayName',
+                    customerImageUrl: '$imageUrl',
+                }
+            },
+        ]).exec((err, result) => {
+            if (err) {
+                res.status(401).json({
+                    message: err
+                })
+            }
+            else {
+                cusName = result[0].customerName;
+                cusImageUrl = result[0].customerImageUrl;
+                addMember(cusName, cusImageUrl);
+            }
+        });
+    }
+
+    function addMember(cusName, cusImageUrl) {
         coEatingTableCollection.updateOne({ inviteCode: req.body.inviteCode }, {
             $push: {
                 baskets: {
@@ -186,9 +257,10 @@ router.post("/join", (req, res, next) => {
             }
             else {
                 res.status(200).json({
-                    message: 'user added',
                     inviteCode: req.body.inviteCode,
-                    userId: req.body.userId
+                    userId: req.body.userId,
+                    customerName: cusName,
+                    customerImageUrl: cusImageUrl,
                 });
             }
         });
