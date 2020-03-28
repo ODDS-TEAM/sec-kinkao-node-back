@@ -198,7 +198,7 @@ router.post("/join", (req, res, next) => {
 
     function checkExistMember(tableId) {
         coEatingTableCollection.find({
-            _id : tableId,
+            _id: tableId,
             baskets: {
                 $elemMatch: { customerId: req.body.userId }
             },
@@ -293,18 +293,65 @@ router.get("/list/:userId", (req, res, next) => {
 });
 
 router.get("/view/:tableId", (req, res, next) => {
-    coEatingTableCollection.find({ _id: req.params.tableId })
-        .exec()
-        .then(doc => {
-            if (doc.length >= 1) {
-                res.status(200).json(doc[0])
+    coEatingTableCollection.aggregate([
+        {
+            $match: { _id: req.params.tableId }
+        },
+        {
+            $unwind: "$baskets"
+        },
+        {
+            $lookup: {
+                from: "customeraccounts",
+                localField: "baskets.customerId",
+                foreignField: "_id",
+                as: "fromCustomerAccount"
+            },
+        },
+        {
+            $unwind: "$fromCustomerAccount"
+        },
+        {
+            $group: {
+                _id: "$_id",
+                leaderId: { "$first": "$leaderId" },
+                tableName: { "$first": "$tableName" },
+                restaurantName: { "$first": "$restaurantName" },
+                merchantId: { "$first": "$merchantId" },
+                inviteCode: { "$first": "$inviteCode" },
+                state: { "$first": "$state" },
+                baskets: {
+                    $push: {
+                        customerId: "$baskets.customerId",
+                        customerName: "$fromCustomerAccount.displayName",
+                        customerImageUrl: "$fromCustomerAccount.imageUrl",
+                        items: "$baskets.items"
+                    },
+                },
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+            }
+        },
+    ]).exec((err, result) => {
+        if (err) {
+            res.status(401).json({
+                message: err
+            })
+        }
+        else {
+            if (result.length >= 1) {
+                res.status(200).json(result[0])
             }
             else {
                 res.status(401).json({
                     message: "empty"
                 });
             }
-        });
+        }
+    });
 });
 
 router.get("/view/menu/:merchantId", (req, res, next) => {
